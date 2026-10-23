@@ -13,8 +13,8 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-data "aws_availability_zones" "available" {
-  state = "available"
+locals {
+  az_names = ["us-east-1a", "us-east-1b"]
 }
 
 # VPC Config for public access
@@ -30,7 +30,7 @@ resource "aws_subnet" "lab-subnet-public-1" {
   vpc_id                  = aws_vpc.lab-vpc.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
-  availability_zone       = data.aws_availability_zones.available.names[0]
+  availability_zone = local.az_names[count.index]
 }
 resource "aws_internet_gateway" "my_vpc_igw" {
   vpc_id = aws_vpc.lab-vpc.id
@@ -57,7 +57,7 @@ resource "aws_route_table_association" "my_vpc_us_east_1a_public" {
 resource "aws_subnet" "lab-subnet-public-1b" {
   vpc_id                  = aws_vpc.lab-vpc.id
   cidr_block              = "10.0.128.0/24"
-  availability_zone       = data.aws_availability_zones.available.names[1]
+  availability_zone = local.az_names[count.index]
   map_public_ip_on_launch = true
 }
 resource "aws_route_table_association" "my_vpc_us_east_1b_public" {
@@ -336,20 +336,11 @@ resource "aws_iam_role_policy_attachment" "ecs-instance-role-attachment-ssm" {
 }
 
 
-data "aws_ami" "ecs_optimized_ami" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-ecs-hvm-2.0.202*-x86_64-ebs"]
-  }
-}
 
 
 resource "aws_launch_template" "ecs_launch_template" {
   name_prefix   = "ecs-launch-template-"
-  image_id      = data.aws_ami.ecs_optimized_ami.id
+  image_id = "ami-0c58de89f41dfd16a"
   instance_type = "t2.micro"
 
   iam_instance_profile {
