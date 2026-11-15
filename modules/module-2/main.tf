@@ -457,7 +457,9 @@ resource "aws_lb_listener" "listener" {
 }
 
 
-resource "aws_secretsmanager_secret" "rds_creds" { name = "RDS_CREDS-${var.environment}"
+resource "aws_secretsmanager_secret" "rds_creds" {
+  name = "RDS_CREDS-${var.environment}"
+}
 
 resource "aws_secretsmanager_secret_version" "secret_version" {
   secret_id     = aws_secretsmanager_secret.rds_creds.id
