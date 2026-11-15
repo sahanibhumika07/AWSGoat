@@ -147,7 +147,7 @@ resource "aws_db_instance" "database-instance" {
 
 resource "aws_security_group" "load_balancer_security_group" {
   name        = "Load-Balancer-SG"
-  description = "SG for load balancer created from terraform"
+  description = "SG for cluster created from terraform"
   vpc_id      = aws_vpc.lab-vpc.id
 
   ingress {
@@ -455,7 +455,6 @@ resource "aws_lb_listener" "listener" {
     target_group_arn = aws_lb_target_group.target_group.id
   }
 }
-
 
 resource "aws_secretsmanager_secret" "rds_creds" {
   name = "RDS_CREDS-${var.environment}"
